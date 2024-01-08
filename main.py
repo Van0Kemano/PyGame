@@ -4,7 +4,7 @@ import sys, os
 
 class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y):
-        super().__init__(all_sprites)
+        super().__init__(main_menu)
         sheet = pygame.transform.scale(sheet, (512, 128))
         self.frames = []
         self.cut_sheet(sheet, columns, rows)
@@ -36,7 +36,7 @@ def load_image(name, colorkey=None):
 
 class Border(pygame.sprite.Sprite):
     def __init__(self, x1, y1, x2, y2):
-        super().__init__(all_sprites)
+        super().__init__(main_menu)
         if x1 == x2:
             self.add(vertical_borders)
             self.image = pygame.Surface([1, y2 - y1])
@@ -49,7 +49,7 @@ class Border(pygame.sprite.Sprite):
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, sheet):
-        super().__init__(all_sprites)
+        super().__init__(players)
         pl_image = sheet
         pl_image = pygame.transform.scale(pl_image, (64, 64))
         self.image = pl_image
@@ -58,19 +58,24 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = 200
 
     def move(self):
-        if pygame.sprite.spritecollideany(self, horizontal_borders):
-            self.rect.y = -self.rect.y
-        if pygame.sprite.spritecollideany(self, vertical_borders):
-            self.rect.x = -self.rect.x
+        if pygame.sprite.spritecollideany(self, horizontal_borders) and self.rect.y < 200:
+            self.rect.y += 5
+        elif pygame.sprite.spritecollideany(self, horizontal_borders) and self.rect.y > 200:
+            self.rect.y -= 5
+        if pygame.sprite.spritecollideany(self, vertical_borders) and self.rect.x < 200:
+            self.rect.x += 5
+        elif pygame.sprite.spritecollideany(self, vertical_borders) and self.rect.x > 200:
+            self.rect.x -= 5
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                self.rect.y -= 10
+                self.rect.y -= 5
             elif event.key == pygame.K_DOWN:
-                self.rect.y += 10
+                self.rect.y += 5
             elif event.key == pygame.K_RIGHT:
-                self.rect.x += 10
+                self.rect.x += 5
             elif event.key == pygame.K_LEFT:
-                self.rect.x -= 10
+                self.rect.x -= 5
+        return [self.rect.x, self.rect.y]
 
 
 class MainMenu:
@@ -83,13 +88,9 @@ class MainMenu:
         Border(width - 5, 5, width - 5, height - 5)
 
     def render(self, screen):
-        # main_char = AnimatedSprite(load_image("main_char.png"), 4, 1, 32, 32)
-        # main_char.rect.x = 240
-        # main_char.rect.y = 200
-
         play_image = load_image("play.png")
         play_image = pygame.transform.scale(play_image, (500, 500))
-        play = pygame.sprite.Sprite(all_sprites, text_sprite)
+        play = pygame.sprite.Sprite(main_menu)
         play.image = play_image
         play.rect = play.image.get_rect()
         play.rect.x = 360
@@ -97,7 +98,7 @@ class MainMenu:
 
         pyg_image = load_image("pygame.png")
         pyg_image = pygame.transform.scale(pyg_image, (500, 500))
-        pyg = pygame.sprite.Sprite(all_sprites, text_sprite)
+        pyg = pygame.sprite.Sprite(main_menu)
         pyg.image = pyg_image
         pyg.rect = pyg.image.get_rect()
         pyg.rect.x = 360
@@ -122,25 +123,31 @@ class Board:
 
 if __name__ == '__main__':
     pygame.init()
-    all_sprites = pygame.sprite.Group()
+    main_menu = pygame.sprite.Group()
+    players = pygame.sprite.Group()
     horizontal_borders = pygame.sprite.Group()
     vertical_borders = pygame.sprite.Group()
-    text_sprite = pygame.sprite.Group()
     clock = pygame.time.Clock()
-    FPS = 30
+    FPS = 60
     screen = pygame.display.set_mode((1280, 720))
     main = MainMenu()
     board = Board()
     player = Player(load_image("main_char1.png"))
     running = True
+    main.render(screen)
+    PLAYBUTTONDOWN = pygame.USEREVENT + 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
         clock.tick(FPS)
-        screen.fill((70, 89, 70))
-        all_sprites.draw(screen)
-        main.render(screen)
-        player.move()
+        if (790 >= player.move()[0] >= 365) and (470 >= player.move()[1] >= 355):
+            screen.fill((0, 0, 0))
+            board.render(screen)
+        else:
+            screen.fill((70, 89, 70))
+            main_menu.draw(screen)
+            player.move()
+            players.draw(screen)
         pygame.display.flip()
     pygame.quit()
