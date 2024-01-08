@@ -120,6 +120,14 @@ class Board:
                 pygame.draw.rect(screen, pygame.Color(255, 255, 255), (
                     j * self.cell_size + self.left, i * self.cell_size + self.top, self.cell_size, self.cell_size), 1)
 
+    def level1(self, screen):
+        f = open("levels/level_1.txt", 'r')
+        for i in range(self.height):
+            for j in range(self.width):
+                pygame.draw.rect(screen, pygame.Color(255, 255, 255), (
+                    j * self.cell_size + self.left, i * self.cell_size + self.top, self.cell_size, self.cell_size), 1)
+        f.close()
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -142,7 +150,7 @@ if __name__ == '__main__':
                 running = False
         clock.tick(FPS)
         if (790 >= player.move()[0] >= 365) and (470 >= player.move()[1] >= 355):
-            screen.fill((0, 0, 0))
+            screen.fill((70, 89, 70))
             board.render(screen)
         else:
             screen.fill((70, 89, 70))
