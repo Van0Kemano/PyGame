@@ -122,10 +122,23 @@ class Board:
 
     def level1(self, screen):
         f = open("levels/level_1.txt", 'r')
-        for i in range(self.height):
-            for j in range(self.width):
-                pygame.draw.rect(screen, pygame.Color(255, 255, 255), (
-                    j * self.cell_size + self.left, i * self.cell_size + self.top, self.cell_size, self.cell_size), 1)
+        lines = f.readlines()
+        for line in lines:
+            for sym in line:
+                for i in range(self.height):
+                    for j in range(self.width):
+                        if sym == ".":
+                            pygame.draw.rect(screen, pygame.Color(255, 255, 255), (
+                                j * self.cell_size + self.left, i * self.cell_size + self.top, self.cell_size,
+                                self.cell_size), 1)
+                        elif sym == "#":
+                            pygame.draw.rect(screen, pygame.Color(0, 0, 0), (
+                                j * self.cell_size + self.left, i * self.cell_size + self.top, self.cell_size,
+                                self.cell_size), 1)
+                        else:
+                            pygame.draw.rect(screen, pygame.Color(70, 89, 70), (
+                                j * self.cell_size + self.left, i * self.cell_size + self.top, self.cell_size,
+                                self.cell_size), 1)
         f.close()
 
 
@@ -143,7 +156,6 @@ if __name__ == '__main__':
     player = Player(load_image("main_char1.png"))
     running = True
     main.render(screen)
-    PLAYBUTTONDOWN = pygame.USEREVENT + 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -151,7 +163,6 @@ if __name__ == '__main__':
         clock.tick(FPS)
         if (790 >= player.move()[0] >= 365) and (470 >= player.move()[1] >= 355):
             screen.fill((70, 89, 70))
-            board.render(screen)
         else:
             screen.fill((70, 89, 70))
             main_menu.draw(screen)
